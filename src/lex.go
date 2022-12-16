@@ -3,7 +3,6 @@ package vic
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io"
 	"strings"
 
@@ -39,7 +38,7 @@ func (l *Lexer) read() rune {
 	return ch
 }
 func (l *Lexer) Error(s string) {
-	fmt.Printf("Error: %s", s)
+    //ignore
 }
 func (l *Lexer) unread() { _ = l.r.UnreadRune() }
 func (l *Lexer) Lex(out *yySymType) int {
@@ -165,5 +164,6 @@ type Expression struct {
 type Statement struct {
 	id *Identifier
 	ex *Expression
+    lit string
 }
 
