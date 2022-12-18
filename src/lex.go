@@ -38,21 +38,21 @@ func (l *Lexer) read() rune {
 	return ch
 }
 func (l *Lexer) Error(s string) {
-    //ignore
+	//ignore
 }
 func (l *Lexer) unread() { _ = l.r.UnreadRune() }
 func (l *Lexer) Lex(out *yySymType) int {
 	l.skipWhitespace()
-    ch := l.read()
+	ch := l.read()
 	out.Literal = string(ch)
-    if isLetter(ch) {
+	if isLetter(ch) || isDigit(ch) {
 		l.unread()
-		return l.scanIdent(out)
+		return l.scanIdOrValue(out)
 	}
 
 	switch ch {
 	case eof:
-		return -1  // EOF
+		return -1 // EOF
 	case '/':
 		return TSLASH
 	case '-':
@@ -87,7 +87,7 @@ func (l *Lexer) skipWhitespace() {
 		}
 	}
 }
-func (l *Lexer) scanIdent(out *yySymType) int {
+func (l *Lexer) scanIdOrValue(out *yySymType) int {
 	var buf bytes.Buffer
 	buf.WriteRune(l.read())
 	for {
@@ -122,48 +122,3 @@ func (l *Lexer) scanIdent(out *yySymType) int {
 
 	return ILLEGAL
 }
-
-type IdentifierType int
-
-const (
-	RAW IdentifierType = iota
-	DOT
-	BRACK
-)
-
-type Identifier struct {
-    typ   IdentifierType
-	lit   string
-	root  *Identifier
-	dot   *Identifier
-	brack *Identifier
-}
-type ExpressionType int
-
-const (
-	// Expression Types
-	NEG ExpressionType = iota
-	PAREN
-	MOD
-	POW
-	MULT
-	DIV
-	PLUS
-	MINUS
-
-	ID
-	VAL
-)
-
-type Expression struct {
-	typ ExpressionType
-	id  *Identifier
-	e   []*Expression
-	lit string
-}
-type Statement struct {
-	id *Identifier
-	ex *Expression
-    lit string
-}
-
