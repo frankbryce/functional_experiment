@@ -65,6 +65,10 @@ func (l *Lexer) Lex(out *yySymType) int {
 		return TLPAREN
 	case ')':
 		return TRPAREN
+	case '[':
+		return TLBRACK
+	case ']':
+		return TRBRACK
 	case '%':
 		return TPERCENT
 	case '=':

@@ -16,294 +16,311 @@ state 1
 
 
 state 2
+	statement:  identifier.TEQUALS 
 	statement:  identifier.TEQUALS expression 
-	identifier:  identifier.TDOT identifier 
 
 	TEQUALS  shift 4
-	TDOT  shift 5
 	.  error
 
 
 state 3
-	identifier:  TSTRING.    (2)
+	identifier:  TSTRING.    (3)
 
-	.  reduce 2 (src line 69)
+	.  reduce 3 (src line 90)
 
 
 state 4
+	statement:  identifier TEQUALS.    (1)
 	statement:  identifier TEQUALS.expression 
 
-	TDASH  shift 9
-	TLPAREN  shift 10
+	TDASH  shift 8
+	TLPAREN  shift 9
 	TSTRING  shift 3
-	TNUMBER  shift 11
-	TFALSE  shift 12
-	TTRUE  shift 13
-	TNULL  shift 14
-	.  error
+	TNUMBER  shift 10
+	TFALSE  shift 11
+	TTRUE  shift 12
+	TNULL  shift 13
+	.  reduce 1 (src line 81)
 
-	constant  goto 8
-	expression  goto 6
-	identifier  goto 7
+	value  goto 7
+	expression  goto 5
+	identifier  goto 6
 
 state 5
-	identifier:  identifier TDOT.identifier 
-
-	TSTRING  shift 3
-	.  error
-
-	identifier  goto 15
-
-state 6
-	statement:  identifier TEQUALS expression.    (1)
+	statement:  identifier TEQUALS expression.    (2)
 	expression:  expression.TPLUS expression 
 	expression:  expression.TDASH expression 
 	expression:  expression.TASTERISK expression 
 	expression:  expression.TSLASH expression 
 	expression:  expression.TCARET expression 
+	expression:  expression.TLBRACK statement TRBRACK 
 
-	TSLASH  shift 19
-	TDASH  shift 17
-	TPLUS  shift 16
-	TASTERISK  shift 18
-	TCARET  shift 20
-	.  reduce 1 (src line 65)
+	TSLASH  shift 17
+	TDASH  shift 15
+	TPLUS  shift 14
+	TASTERISK  shift 16
+	TCARET  shift 18
+	TLBRACK  shift 19
+	.  reduce 2 (src line 85)
+
+
+state 6
+	expression:  identifier.    (9)
+
+	.  reduce 9 (src line 115)
 
 
 state 7
-	identifier:  identifier.TDOT identifier 
-	expression:  identifier.    (9)
+	expression:  value.    (10)
 
-	TDOT  shift 5
-	.  reduce 9 (src line 96)
+	.  reduce 10 (src line 120)
 
 
 state 8
-	expression:  constant.    (10)
-
-	.  reduce 10 (src line 101)
-
-
-state 9
 	expression:  TDASH.expression 
 
-	TDASH  shift 9
-	TLPAREN  shift 10
+	TDASH  shift 8
+	TLPAREN  shift 9
 	TSTRING  shift 3
-	TNUMBER  shift 11
-	TFALSE  shift 12
-	TTRUE  shift 13
-	TNULL  shift 14
+	TNUMBER  shift 10
+	TFALSE  shift 11
+	TTRUE  shift 12
+	TNULL  shift 13
 	.  error
 
-	constant  goto 8
-	expression  goto 21
-	identifier  goto 7
+	value  goto 7
+	expression  goto 20
+	identifier  goto 6
 
-state 10
+state 9
 	expression:  TLPAREN.expression TRPAREN 
 
-	TDASH  shift 9
-	TLPAREN  shift 10
+	TDASH  shift 8
+	TLPAREN  shift 9
 	TSTRING  shift 3
-	TNUMBER  shift 11
-	TFALSE  shift 12
-	TTRUE  shift 13
-	TNULL  shift 14
+	TNUMBER  shift 10
+	TFALSE  shift 11
+	TTRUE  shift 12
+	TNULL  shift 13
 	.  error
 
-	constant  goto 8
-	expression  goto 22
-	identifier  goto 7
+	value  goto 7
+	expression  goto 21
+	identifier  goto 6
+
+state 10
+	value:  TNUMBER.    (4)
+	value:  TNUMBER.TDOT TNUMBER 
+
+	TDOT  shift 22
+	.  reduce 4 (src line 94)
+
 
 state 11
-	constant:  TNUMBER.    (4)
-	constant:  TNUMBER.TDOT TNUMBER 
+	value:  TFALSE.    (6)
 
-	TDOT  shift 23
-	.  reduce 4 (src line 76)
+	.  reduce 6 (src line 105)
 
 
 state 12
-	constant:  TFALSE.    (6)
+	value:  TTRUE.    (7)
 
-	.  reduce 6 (src line 87)
+	.  reduce 7 (src line 108)
 
 
 state 13
-	constant:  TTRUE.    (7)
+	value:  TNULL.    (8)
 
-	.  reduce 7 (src line 90)
+	.  reduce 8 (src line 111)
 
 
 state 14
-	constant:  TNULL.    (8)
-
-	.  reduce 8 (src line 93)
-
-
-state 15
-	identifier:  identifier.TDOT identifier 
-	identifier:  identifier TDOT identifier.    (3)
-
-	TDOT  shift 5
-	.  reduce 3 (src line 72)
-
-
-state 16
 	expression:  expression TPLUS.expression 
 
-	TDASH  shift 9
-	TLPAREN  shift 10
+	TDASH  shift 8
+	TLPAREN  shift 9
 	TSTRING  shift 3
-	TNUMBER  shift 11
-	TFALSE  shift 12
-	TTRUE  shift 13
-	TNULL  shift 14
+	TNUMBER  shift 10
+	TFALSE  shift 11
+	TTRUE  shift 12
+	TNULL  shift 13
 	.  error
 
-	constant  goto 8
-	expression  goto 24
-	identifier  goto 7
+	value  goto 7
+	expression  goto 23
+	identifier  goto 6
 
-state 17
+state 15
 	expression:  expression TDASH.expression 
 
-	TDASH  shift 9
-	TLPAREN  shift 10
+	TDASH  shift 8
+	TLPAREN  shift 9
 	TSTRING  shift 3
-	TNUMBER  shift 11
-	TFALSE  shift 12
-	TTRUE  shift 13
-	TNULL  shift 14
+	TNUMBER  shift 10
+	TFALSE  shift 11
+	TTRUE  shift 12
+	TNULL  shift 13
 	.  error
 
-	constant  goto 8
-	expression  goto 25
-	identifier  goto 7
+	value  goto 7
+	expression  goto 24
+	identifier  goto 6
 
-state 18
+state 16
 	expression:  expression TASTERISK.expression 
 
-	TDASH  shift 9
-	TLPAREN  shift 10
+	TDASH  shift 8
+	TLPAREN  shift 9
 	TSTRING  shift 3
-	TNUMBER  shift 11
-	TFALSE  shift 12
-	TTRUE  shift 13
-	TNULL  shift 14
+	TNUMBER  shift 10
+	TFALSE  shift 11
+	TTRUE  shift 12
+	TNULL  shift 13
 	.  error
 
-	constant  goto 8
-	expression  goto 26
-	identifier  goto 7
+	value  goto 7
+	expression  goto 25
+	identifier  goto 6
 
-state 19
+state 17
 	expression:  expression TSLASH.expression 
 
-	TDASH  shift 9
-	TLPAREN  shift 10
+	TDASH  shift 8
+	TLPAREN  shift 9
 	TSTRING  shift 3
-	TNUMBER  shift 11
-	TFALSE  shift 12
-	TTRUE  shift 13
-	TNULL  shift 14
+	TNUMBER  shift 10
+	TFALSE  shift 11
+	TTRUE  shift 12
+	TNULL  shift 13
 	.  error
 
-	constant  goto 8
-	expression  goto 27
-	identifier  goto 7
+	value  goto 7
+	expression  goto 26
+	identifier  goto 6
 
-state 20
+state 18
 	expression:  expression TCARET.expression 
 
-	TDASH  shift 9
-	TLPAREN  shift 10
+	TDASH  shift 8
+	TLPAREN  shift 9
 	TSTRING  shift 3
-	TNUMBER  shift 11
-	TFALSE  shift 12
-	TTRUE  shift 13
-	TNULL  shift 14
+	TNUMBER  shift 10
+	TFALSE  shift 11
+	TTRUE  shift 12
+	TNULL  shift 13
 	.  error
 
-	constant  goto 8
-	expression  goto 28
-	identifier  goto 7
+	value  goto 7
+	expression  goto 27
+	identifier  goto 6
 
-state 21
+state 19
+	expression:  expression TLBRACK.statement TRBRACK 
+
+	TSTRING  shift 3
+	.  error
+
+	statement  goto 28
+	identifier  goto 2
+
+state 20
 	expression:  expression.TPLUS expression 
 	expression:  expression.TDASH expression 
 	expression:  expression.TASTERISK expression 
 	expression:  expression.TSLASH expression 
 	expression:  TDASH expression.    (15)
 	expression:  expression.TCARET expression 
+	expression:  expression.TLBRACK statement TRBRACK 
 
-	TCARET  shift 20
-	.  reduce 15 (src line 128)
+	TCARET  shift 18
+	TLBRACK  shift 19
+	.  reduce 15 (src line 147)
 
 
-state 22
+state 21
 	expression:  expression.TPLUS expression 
 	expression:  expression.TDASH expression 
 	expression:  expression.TASTERISK expression 
 	expression:  expression.TSLASH expression 
 	expression:  expression.TCARET expression 
 	expression:  TLPAREN expression.TRPAREN 
+	expression:  expression.TLBRACK statement TRBRACK 
 
-	TSLASH  shift 19
-	TDASH  shift 17
-	TPLUS  shift 16
-	TASTERISK  shift 18
-	TCARET  shift 20
+	TSLASH  shift 17
+	TDASH  shift 15
+	TPLUS  shift 14
+	TASTERISK  shift 16
+	TCARET  shift 18
 	TRPAREN  shift 29
+	TLBRACK  shift 19
 	.  error
 
 
-state 23
-	constant:  TNUMBER TDOT.TNUMBER 
+state 22
+	value:  TNUMBER TDOT.TNUMBER 
 
 	TNUMBER  shift 30
 	.  error
 
 
-state 24
+state 23
 	expression:  expression.TPLUS expression 
 	expression:  expression TPLUS expression.    (11)
 	expression:  expression.TDASH expression 
 	expression:  expression.TASTERISK expression 
 	expression:  expression.TSLASH expression 
 	expression:  expression.TCARET expression 
+	expression:  expression.TLBRACK statement TRBRACK 
 
-	TSLASH  shift 19
-	TASTERISK  shift 18
-	TCARET  shift 20
-	.  reduce 11 (src line 104)
+	TSLASH  shift 17
+	TASTERISK  shift 16
+	TCARET  shift 18
+	TLBRACK  shift 19
+	.  reduce 11 (src line 123)
 
 
-state 25
+state 24
 	expression:  expression.TPLUS expression 
 	expression:  expression.TDASH expression 
 	expression:  expression TDASH expression.    (12)
 	expression:  expression.TASTERISK expression 
 	expression:  expression.TSLASH expression 
 	expression:  expression.TCARET expression 
+	expression:  expression.TLBRACK statement TRBRACK 
 
-	TSLASH  shift 19
-	TASTERISK  shift 18
-	TCARET  shift 20
-	.  reduce 12 (src line 110)
+	TSLASH  shift 17
+	TASTERISK  shift 16
+	TCARET  shift 18
+	TLBRACK  shift 19
+	.  reduce 12 (src line 129)
 
 
-state 26
+state 25
 	expression:  expression.TPLUS expression 
 	expression:  expression.TDASH expression 
 	expression:  expression.TASTERISK expression 
 	expression:  expression TASTERISK expression.    (13)
 	expression:  expression.TSLASH expression 
 	expression:  expression.TCARET expression 
+	expression:  expression.TLBRACK statement TRBRACK 
 
-	TCARET  shift 20
-	.  reduce 13 (src line 116)
+	TCARET  shift 18
+	TLBRACK  shift 19
+	.  reduce 13 (src line 135)
+
+
+state 26
+	expression:  expression.TPLUS expression 
+	expression:  expression.TDASH expression 
+	expression:  expression.TASTERISK expression 
+	expression:  expression.TSLASH expression 
+	expression:  expression TSLASH expression.    (14)
+	expression:  expression.TCARET expression 
+	expression:  expression.TLBRACK statement TRBRACK 
+
+	TCARET  shift 18
+	TLBRACK  shift 19
+	.  reduce 14 (src line 141)
 
 
 state 27
@@ -311,46 +328,49 @@ state 27
 	expression:  expression.TDASH expression 
 	expression:  expression.TASTERISK expression 
 	expression:  expression.TSLASH expression 
-	expression:  expression TSLASH expression.    (14)
 	expression:  expression.TCARET expression 
+	expression:  expression TCARET expression.    (16)
+	expression:  expression.TLBRACK statement TRBRACK 
 
-	TCARET  shift 20
-	.  reduce 14 (src line 122)
+	TCARET  shift 18
+	TLBRACK  shift 19
+	.  reduce 16 (src line 153)
 
 
 state 28
-	expression:  expression.TPLUS expression 
-	expression:  expression.TDASH expression 
-	expression:  expression.TASTERISK expression 
-	expression:  expression.TSLASH expression 
-	expression:  expression.TCARET expression 
-	expression:  expression TCARET expression.    (16)
+	expression:  expression TLBRACK statement.TRBRACK 
 
-	TCARET  shift 20
-	.  reduce 16 (src line 134)
+	TRBRACK  shift 31
+	.  error
 
 
 state 29
 	expression:  TLPAREN expression TRPAREN.    (17)
 
-	.  reduce 17 (src line 140)
+	.  reduce 17 (src line 159)
 
 
 state 30
-	constant:  TNUMBER TDOT TNUMBER.    (5)
+	value:  TNUMBER TDOT TNUMBER.    (5)
 
-	.  reduce 5 (src line 81)
+	.  reduce 5 (src line 99)
 
 
-21 terminals, 5 nonterminals
-18 grammar rules, 31/16000 states
+state 31
+	expression:  expression TLBRACK statement TRBRACK.    (18)
+
+	.  reduce 18 (src line 165)
+
+
+23 terminals, 5 nonterminals
+19 grammar rules, 32/16000 states
 0 shift/reduce, 0 reduce/reduce conflicts reported
 54 working sets used
-memory: parser 33/240000
-22 extra closures
-85 shift entries, 1 exceptions
-13 goto entries
+memory: parser 35/240000
+31 extra closures
+91 shift entries, 1 exceptions
+14 goto entries
 14 entries saved by goto default
-Optimizer space used: output 47/240000
-47 table entries, 6 zero
-maximum spread: 19, maximum offset: 20
+Optimizer space used: output 52/240000
+52 table entries, 7 zero
+maximum spread: 21, maximum offset: 19

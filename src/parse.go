@@ -24,16 +24,31 @@ func Parse(l *Lexer) (*Statement, error) {
 
 func mergeIds(e1, e2 *Expression) map[string]bool {
 	ids := make(map[string]bool)
-	for id, _ := range e1.ids {
-		ids[id] = true
+	if e1 != nil {
+		for id, _ := range e1.ids {
+			ids[id] = true
+		}
 	}
-	for id, _ := range e2.ids {
-		ids[id] = true
+	if e2 != nil {
+		for id, _ := range e2.ids {
+			ids[id] = true
+		}
 	}
 	return ids
 }
 
-//line vic.y:31
+func subtractId(e *Expression, id *Identifier) map[string]bool {
+	ids := make(map[string]bool)
+	for id, _ := range e.ids {
+		ids[id] = true
+	}
+	if _, ok := ids[id.lit]; ok {
+		delete(ids, id.lit)
+	}
+	return ids
+}
+
+//line vic.y:46
 type yySymType struct {
 	yys        int
 	Literal    string
@@ -51,16 +66,18 @@ const TPERCENT = 57350
 const TCARET = 57351
 const TLPAREN = 57352
 const TRPAREN = 57353
-const TEQUALS = 57354
-const TDOT = 57355
-const ILLEGAL = 57356
-const TSTRING = 57357
-const TNUMBER = 57358
-const TFALSE = 57359
-const TTRUE = 57360
-const TNULL = 57361
-const TAMPERSAND = 57362
-const NEGATE = 57363
+const TLBRACK = 57354
+const TRBRACK = 57355
+const TEQUALS = 57356
+const TDOT = 57357
+const ILLEGAL = 57358
+const TSTRING = 57359
+const TNUMBER = 57360
+const TFALSE = 57361
+const TTRUE = 57362
+const TNULL = 57363
+const TAMPERSAND = 57364
+const NEGATE = 57365
 
 var yyToknames = [...]string{
 	"$end",
@@ -74,6 +91,8 @@ var yyToknames = [...]string{
 	"TCARET",
 	"TLPAREN",
 	"TRPAREN",
+	"TLBRACK",
+	"TRBRACK",
 	"TEQUALS",
 	"TDOT",
 	"ILLEGAL",
@@ -92,7 +111,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line vic.y:148
+//line vic.y:188
 
 //line yacctab:1
 var yyExca = [...]int{
@@ -103,49 +122,50 @@ var yyExca = [...]int{
 
 const yyPrivate = 57344
 
-const yyLast = 47
+const yyLast = 52
 
 var yyAct = [...]int{
-	6, 30, 9, 3, 4, 5, 5, 10, 23, 20,
-	21, 22, 3, 11, 12, 13, 14, 24, 25, 26,
-	27, 28, 19, 17, 16, 18, 1, 20, 8, 29,
-	19, 17, 16, 18, 19, 20, 0, 18, 0, 20,
-	7, 2, 0, 0, 0, 0, 15,
+	8, 6, 2, 30, 3, 9, 22, 4, 5, 1,
+	31, 7, 3, 10, 11, 12, 13, 20, 21, 18,
+	0, 2, 19, 23, 24, 25, 26, 27, 0, 28,
+	17, 15, 14, 16, 0, 18, 0, 29, 19, 17,
+	15, 14, 16, 17, 18, 0, 16, 19, 18, 0,
+	0, 19,
 }
 
 var yyPact = [...]int{
-	-12, -1000, -8, -1000, -3, -12, 26, -7, -1000, -3,
-	-3, -5, -1000, -1000, -1000, -7, -3, -3, -3, -3,
-	-3, 0, 18, -15, 30, 30, 0, 0, 0, -1000,
-	-1000,
+	-13, -1000, -7, -1000, -5, 35, -1000, -1000, -5, -5,
+	-9, -1000, -1000, -1000, -5, -5, -5, -5, -5, -13,
+	10, 26, -15, 39, 39, 10, 10, 10, -3, -1000,
+	-1000, -1000,
 }
 
 var yyPgo = [...]int{
-	0, 28, 26, 0, 40,
+	0, 11, 9, 8, 1,
 }
 
 var yyR1 = [...]int{
-	0, 2, 4, 4, 1, 1, 1, 1, 1, 3,
-	3, 3, 3, 3, 3, 3, 3, 3,
+	0, 2, 2, 4, 1, 1, 1, 1, 1, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3,
 }
 
 var yyR2 = [...]int{
-	0, 3, 1, 3, 1, 3, 1, 1, 1, 1,
-	1, 3, 3, 3, 3, 2, 3, 3,
+	0, 2, 3, 1, 1, 3, 1, 1, 1, 1,
+	1, 3, 3, 3, 3, 2, 3, 3, 4,
 }
 
 var yyChk = [...]int{
-	-1000, -2, -4, 15, 12, 13, -3, -4, -1, 5,
-	10, 16, 17, 18, 19, -4, 6, 5, 7, 4,
-	9, -3, -3, 13, -3, -3, -3, -3, -3, 11,
-	16,
+	-1000, -2, -4, 17, 14, -3, -4, -1, 5, 10,
+	18, 19, 20, 21, 6, 5, 7, 4, 9, 12,
+	-3, -3, 15, -3, -3, -3, -3, -3, -2, 11,
+	18, 13,
 }
 
 var yyDef = [...]int{
-	0, -2, 0, 2, 0, 0, 1, 9, 10, 0,
-	0, 4, 6, 7, 8, 3, 0, 0, 0, 0,
-	0, 15, 0, 0, 11, 12, 13, 14, 16, 17,
-	5,
+	0, -2, 0, 3, 1, 2, 9, 10, 0, 0,
+	4, 6, 7, 8, 0, 0, 0, 0, 0, 0,
+	15, 0, 0, 11, 12, 13, 14, 16, 0, 17,
+	5, 18,
 }
 
 var yyTok1 = [...]int{
@@ -155,6 +175,7 @@ var yyTok1 = [...]int{
 var yyTok2 = [...]int{
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+	22, 23,
 }
 
 var yyTok3 = [...]int{
@@ -499,26 +520,28 @@ yydefault:
 	switch yynt {
 
 	case 1:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line vic.y:65
-		{
-			stmt = &Statement{id: yyDollar[1].Identifier, ex: yyDollar[3].Expression, lit: yyDollar[1].Identifier.lit + yyDollar[2].Literal + yyDollar[3].Expression.lit}
+		yyDollar = yyS[yypt-2 : yypt+1]
+//line vic.y:81
+		{ // deletes identifier from runtime
+			stmt = &Statement{id: yyDollar[1].Identifier, ex: nil, lit: yyDollar[1].Identifier.lit + yyDollar[2].Literal}
+			yyVAL.Statement = stmt
 		}
 	case 2:
+		yyDollar = yyS[yypt-3 : yypt+1]
+//line vic.y:85
+		{
+			stmt = &Statement{id: yyDollar[1].Identifier, ex: yyDollar[3].Expression, lit: yyDollar[1].Identifier.lit + yyDollar[2].Literal + yyDollar[3].Expression.lit}
+			yyVAL.Statement = stmt
+		}
+	case 3:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line vic.y:69
+//line vic.y:90
 		{
 			yyVAL.Identifier = &Identifier{typ: RAW, lit: yyDollar[1].Literal}
 		}
-	case 3:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line vic.y:72
-		{
-			yyVAL.Identifier = &Identifier{typ: DOT, root: yyDollar[1].Identifier, dot: yyDollar[3].Identifier, lit: yyDollar[1].Identifier.lit + yyDollar[2].Literal + yyDollar[3].Identifier.lit}
-		}
 	case 4:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line vic.y:76
+//line vic.y:94
 		{
 			f, err := strconv.ParseFloat(yyDollar[1].Literal, 64)
 			if err != nil {
@@ -528,7 +551,7 @@ yydefault:
 		}
 	case 5:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line vic.y:81
+//line vic.y:99
 		{
 			lit := yyDollar[1].Literal + yyDollar[2].Literal + yyDollar[3].Literal
 			f, err := strconv.ParseFloat(lit, 64)
@@ -539,25 +562,25 @@ yydefault:
 		}
 	case 6:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line vic.y:87
+//line vic.y:105
 		{
 			yyVAL.Value = NewBoolValue(false, yyDollar[1].Literal)
 		}
 	case 7:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line vic.y:90
+//line vic.y:108
 		{
 			yyVAL.Value = NewBoolValue(true, yyDollar[1].Literal)
 		}
 	case 8:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line vic.y:93
+//line vic.y:111
 		{
 			yyVAL.Value = NewNullValue(yyDollar[1].Literal)
 		}
 	case 9:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line vic.y:96
+//line vic.y:115
 		{
 			ids := make(map[string]bool)
 			ids[yyDollar[1].Identifier.lit] = true
@@ -565,13 +588,13 @@ yydefault:
 		}
 	case 10:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line vic.y:101
+//line vic.y:120
 		{
 			yyVAL.Expression = &Expression{typ: VAL, val: yyDollar[1].Value, lit: yyDollar[1].Value.lit, ids: make(map[string]bool)}
 		}
 	case 11:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line vic.y:104
+//line vic.y:123
 		{
 			yyVAL.Expression = &Expression{
 				typ: PLUS, e: []*Expression{yyDollar[1].Expression, yyDollar[3].Expression}, lit: yyDollar[1].Expression.lit + yyDollar[2].Literal + yyDollar[3].Expression.lit,
@@ -580,7 +603,7 @@ yydefault:
 		}
 	case 12:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line vic.y:110
+//line vic.y:129
 		{
 			yyVAL.Expression = &Expression{
 				typ: MINUS, e: []*Expression{yyDollar[1].Expression, yyDollar[3].Expression}, lit: yyDollar[1].Expression.lit + yyDollar[2].Literal + yyDollar[3].Expression.lit,
@@ -589,7 +612,7 @@ yydefault:
 		}
 	case 13:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line vic.y:116
+//line vic.y:135
 		{
 			yyVAL.Expression = &Expression{
 				typ: MULT, e: []*Expression{yyDollar[1].Expression, yyDollar[3].Expression}, lit: yyDollar[1].Expression.lit + yyDollar[2].Literal + yyDollar[3].Expression.lit,
@@ -598,7 +621,7 @@ yydefault:
 		}
 	case 14:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line vic.y:122
+//line vic.y:141
 		{
 			yyVAL.Expression = &Expression{
 				typ: DIV, e: []*Expression{yyDollar[1].Expression, yyDollar[3].Expression}, lit: yyDollar[1].Expression.lit + yyDollar[2].Literal + yyDollar[3].Expression.lit,
@@ -607,7 +630,7 @@ yydefault:
 		}
 	case 15:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line vic.y:128
+//line vic.y:147
 		{
 			yyVAL.Expression = &Expression{
 				typ: NEG, e: []*Expression{yyDollar[2].Expression}, lit: yyDollar[1].Literal + yyDollar[2].Expression.lit,
@@ -616,7 +639,7 @@ yydefault:
 		}
 	case 16:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line vic.y:134
+//line vic.y:153
 		{
 			yyVAL.Expression = &Expression{
 				typ: POW, e: []*Expression{yyDollar[1].Expression, yyDollar[3].Expression}, lit: yyDollar[1].Expression.lit + yyDollar[2].Literal + yyDollar[3].Expression.lit,
@@ -625,11 +648,37 @@ yydefault:
 		}
 	case 17:
 		yyDollar = yyS[yypt-3 : yypt+1]
-//line vic.y:140
+//line vic.y:159
 		{
 			yyVAL.Expression = &Expression{
 				typ: PAREN, e: []*Expression{yyDollar[2].Expression}, lit: yyDollar[1].Literal + yyDollar[2].Expression.lit + yyDollar[3].Literal,
 				ids: yyDollar[2].Expression.ids,
+			}
+		}
+	case 18:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line vic.y:165
+		{
+			ids := make(map[string]bool)
+			if yyDollar[1].Expression != nil {
+				for id, _ := range yyDollar[1].Expression.ids {
+					if id == yyDollar[3].Statement.id.lit {
+						continue
+					}
+					ids[id] = true
+				}
+			}
+			if yyDollar[3].Statement.ex != nil {
+				for id, _ := range yyDollar[3].Statement.ex.ids {
+					ids[id] = true
+				}
+			}
+			yyVAL.Expression = &Expression{
+				typ: CTX,
+				e:   []*Expression{yyDollar[1].Expression},
+				lit: yyDollar[1].Expression.lit + yyDollar[2].Literal + yyDollar[3].Statement.lit + yyDollar[4].Literal,
+				ctx: yyDollar[3].Statement,
+				ids: ids,
 			}
 		}
 	}

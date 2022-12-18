@@ -38,32 +38,40 @@ func (r *runtimeImpl) Load(stmt_str string) error {
 	return r.execute(stmt)
 }
 func (r *runtimeImpl) execute(s *Statement) error {
-	// evaluate expression
-	val, err := r.Evaluate(s.ex)
-	if err != nil {
-		return err
-	}
-
-	// cache evaluation & id in runtime
 	var id *Identifier
 	var ok bool
-	if id, ok = r.ids[s.id.lit]; ok {
-		id.val = val
-	} else {
+	if s.ex == nil {
 		id = s.id
-		id.val = val
-		r.ids[id.lit] = id
-	}
+		if _, ok = r.stmts[id.lit]; ok {
+			delete(r.ids, id.lit)
+			delete(r.stmts, id.lit)
+		}
+	} else {
+		// evaluate expression
+		val, err := r.Evaluate(s.ex)
+		if err != nil {
+			return err
+		}
 
-	// cache active Statement for id
-	r.stmts[id.lit] = s
-
-	// cache id_st_deps in runtime
-	for idlit, _ := range s.ex.ids {
-		if _, ok := r.id_st_deps[idlit]; !ok {
-			r.id_st_deps[idlit] = []*Statement{s}
+		// cache evaluation & id in runtime
+		if id, ok = r.ids[s.id.lit]; ok {
+			id.val = val
 		} else {
-			r.id_st_deps[idlit] = append(r.id_st_deps[idlit], s)
+			id = s.id
+			id.val = val
+			r.ids[id.lit] = id
+		}
+
+		// cache active Statement for id
+		r.stmts[id.lit] = s
+
+		// cache id_st_deps in runtime
+		for idlit, _ := range s.ex.ids {
+			if _, ok := r.id_st_deps[idlit]; !ok {
+				r.id_st_deps[idlit] = []*Statement{s}
+			} else {
+				r.id_st_deps[idlit] = append(r.id_st_deps[idlit], s)
+			}
 		}
 	}
 
@@ -106,6 +114,19 @@ func (r *runtimeImpl) Evaluate(e *Expression) (*Value, error) {
 		return nil, fmt.Errorf("Identifier doesn't exist: %v", e.id.lit)
 	case VAL:
 		return e.val, nil
+	case CTX:
+		var restore_stmt *Statement
+		var ok bool
+		if restore_stmt, ok = r.stmts[e.ctx.id.lit]; !ok {
+			restore_stmt = &Statement{id: e.ctx.id, lit: e.ctx.id.lit + "="}
+		}
+		r.execute(e.ctx)
+		v, err := r.Evaluate(e.e[0])
+		if err != nil {
+			return nil, err
+		}
+		r.execute(restore_stmt)
+		return v, nil
 	case NEG:
 		v, err := r.Evaluate(e.e[0])
 		if err != nil {
@@ -213,12 +234,14 @@ const (
 	NULL
 	NUMBER
 	BOOL
+	CTXV
 )
 
 type Value struct {
 	typ valType
 	num float64
 	b   bool
+	ctx *Expression
 	lit string
 }
 
@@ -230,6 +253,12 @@ func NewNumberValue(num float64, lit string) *Value {
 }
 func NewBoolValue(b bool, lit string) *Value {
 	return &Value{typ: BOOL, b: b, lit: lit}
+}
+func NewCtxValue(e *Expression) (*Value, error) {
+	if e.typ != CTX {
+		return nil, fmt.Errorf("Expected CTX expression but got %v", e.typ)
+	}
+	return &Value{typ: CTXV, ctx: e, lit: e.lit}, nil
 }
 
 // Expression Type
@@ -248,6 +277,7 @@ const (
 
 	ID
 	VAL
+	CTX
 )
 
 type Expression struct {
@@ -255,6 +285,7 @@ type Expression struct {
 	id  *Identifier
 	e   []*Expression
 	val *Value
+	ctx *Statement
 	lit string
 
 	// identifier strings that are in this expression

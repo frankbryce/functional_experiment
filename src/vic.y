@@ -18,11 +18,26 @@ func Parse(l *Lexer) (*Statement, error) {
 
 func mergeIds(e1,e2 *Expression) map[string]bool {
     ids := make(map[string]bool)
-    for id, _ := range(e1.ids) {
+    if e1 != nil {
+        for id, _ := range(e1.ids) {
+            ids[id] = true
+        }
+    }
+    if e2 != nil {
+        for id, _ := range(e2.ids) {
+            ids[id] = true
+        }
+    }
+    return ids
+}
+
+func subtractId(e *Expression, id *Identifier) map[string]bool {
+    ids := make(map[string]bool)
+    for id, _ := range(e.ids) {
         ids[id] = true
     }
-    for id, _ := range(e2.ids) {
-        ids[id] = true
+    if _, ok := ids[id.lit]; ok {
+        delete(ids, id.lit)
     }
     return ids
 }
@@ -39,7 +54,7 @@ func mergeIds(e1,e2 *Expression) map[string]bool {
 // math symbols
 %token <Literal> TSLASH TDASH TPLUS TASTERISK TPERCENT TCARET
 // other symbols
-%token <Literal> TLPAREN TRPAREN TEQUALS TDOT
+%token <Literal> TLPAREN TRPAREN TLBRACK TRBRACK TEQUALS TDOT
 // other lex tokens for lexer
 %token <Literal> ILLEGAL
 
@@ -53,27 +68,30 @@ func mergeIds(e1,e2 *Expression) map[string]bool {
 %left NEGATE
 %right TCARET
 %right TDOT
+%right TLBRACK
 
 // grammar productions
-%type <Value> constant
+%type <Value> value
 %type <Statement> statement
 %type <Expression> expression
 %type <Identifier> identifier
 
 %%
 
-statement   : identifier TEQUALS expression {
-                stmt = &Statement{id:$1, ex:$3, lit:$1.lit+$2+$3.lit}
+statement   : identifier TEQUALS { // deletes identifier from runtime
+                stmt = &Statement{id:$1, ex:nil, lit:$1.lit+$2 }
+                $$ = stmt
+            }
+            | identifier TEQUALS expression {
+                stmt = &Statement{id:$1, ex:$3, lit:$1.lit+$2+$3.lit }
+                $$ = stmt
             }
 ;
 identifier  : TSTRING { 
                 $$ = &Identifier{ typ:RAW, lit:$1 }
             }
-            | identifier TDOT identifier {
-                $$ = &Identifier{ typ:DOT, root:$1, dot:$3, lit:$1.lit+$2+$3.lit }
-            }
 ;
-constant    : TNUMBER {
+value       : TNUMBER {
                 f, err := strconv.ParseFloat($1, 64)
                 if err != nil { panic(fmt.Errorf("Error during ParseFloat: %v", err)) }
                 $$ = NewNumberValue(f, $1)
@@ -93,12 +111,13 @@ constant    : TNUMBER {
             | TNULL {
                 $$ = NewNullValue($1)
             }
+;
 expression  : identifier {
                 ids := make(map[string]bool)
                 ids[$1.lit] = true
                 $$ = &Expression{ typ:ID, id:$1, lit:$1.lit, ids:ids }
             }
-            | constant {
+            | value {
                 $$ = &Expression{ typ:VAL, val:$1, lit:$1.lit, ids:make(map[string]bool) }
             }
             | expression TPLUS expression {
@@ -141,6 +160,27 @@ expression  : identifier {
                 $$ = &Expression{
                     typ:PAREN, e:[]*Expression{$2}, lit:$1+$2.lit+$3,
                     ids:$2.ids,
+                }
+            }
+            | expression TLBRACK statement TRBRACK {
+                ids := make(map[string]bool)
+                if $1 != nil {
+                    for id, _ := range($1.ids) {
+                        if id == $3.id.lit { continue }
+                        ids[id] = true
+                    }
+                }
+                if $3.ex != nil {
+                    for id, _ := range($3.ex.ids) {
+                        ids[id] = true
+                    }
+                }
+                $$ = &Expression {
+                    typ:CTX,
+                    e:[]*Expression{$1},
+                    lit:$1.lit+$2+$3.lit+$4,
+                    ctx:$3,
+                    ids:ids,
                 }
             }
 ;
