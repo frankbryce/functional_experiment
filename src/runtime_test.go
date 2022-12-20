@@ -58,6 +58,13 @@ func TestRuntimeLoadsEvaluatesCaches(t *testing.T) {
 						assertNum("b", 5),
 						assertNum("c", 50),
 						assertNum("d", 51)}},
+				line{stmt: "n=5", asserts: []assert{}},
+				line{stmt: "m=n", asserts: []assert{}},
+				line{stmt: "m=2", asserts: []assert{}},
+				line{stmt: "n=", // silent assert that no error happens here
+					asserts: []assert{
+						assertNum("m", 2),
+						assertEmpty("n")}},
 			},
 		}, { // basic contextual evaluation tests
 			lines: []line{
