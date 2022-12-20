@@ -80,20 +80,20 @@ func TestRuntimeLoadsEvaluatesCaches(t *testing.T) {
 					}},
 			},
 		}, {
-		    lines: []line{
-		        line{stmt: "n=5", asserts: []assert{}},
-		        line{stmt: "nn=n*n", asserts: []assert{}},
-		        line{stmt: "m=1+nn[n=4]",
-		            asserts: []assert{
-		                assertNum("n", NUMBER, 5),
-		                assertNum("nn", NUMBER, 25),
-		                assertNum("m", NUMBER, 17),
-		            }},
-                line{stmt: "m=",
-                    asserts: []assert{
-                        assertEmpty("m"),
-                    }},
-		    },
+			lines: []line{
+				line{stmt: "n=5", asserts: []assert{}},
+				line{stmt: "nn=n*n", asserts: []assert{}},
+				line{stmt: "m=1+nn[n=4]",
+					asserts: []assert{
+						assertNum("n", NUMBER, 5),
+						assertNum("nn", NUMBER, 25),
+						assertNum("m", NUMBER, 17),
+					}},
+				line{stmt: "m=",
+					asserts: []assert{
+						assertEmpty("m"),
+					}},
+			},
 		},
 	}
 
