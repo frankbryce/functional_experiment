@@ -77,6 +77,8 @@ func (l *Lexer) Lex(out *yySymType) int {
 		return TCARET
 	case '.':
 		return TDOT
+	case ',':
+		return TCOMMA
 	}
 
 	return ILLEGAL

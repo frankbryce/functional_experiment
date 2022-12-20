@@ -25,4 +25,3 @@ func (d *defaultDisplay) setNumberValue(name string, val float64) error {
 func (d *defaultDisplay) setBoolValue(name string, val bool) error {
 	return nil
 }
-

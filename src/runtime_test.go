@@ -16,82 +16,99 @@ func TestRuntimeLoadsEvaluatesCaches(t *testing.T) {
 	type testCase struct {
 		lines []line
 	}
-	assertNum := func(id string, typ valType, num float64) assert {
-		return assert{id: id, val: &Value{typ: typ, num: num}}
+	assertNum := func(id string, num float64) assert {
+		return assert{id: id, val: &Value{typ: NUMBER, num: num}}
+	}
+	assertBool := func(id string, b bool) assert {
+		return assert{id: id, val: &Value{typ: BOOL, b: b}}
 	}
 	assertEmpty := func(id string) assert {
 		return assert{id: id}
 	}
 	testCases := []testCase{
-		{
+		{ // basic statement and expression tests
 			lines: []line{
 				line{stmt: "c=1",
-					asserts: []assert{assertNum("c", NUMBER, 1)}},
+					asserts: []assert{
+						assertNum("c", 1)}},
 				line{stmt: "d=c+1",
-					asserts: []assert{assertNum("c", NUMBER, 1),
-						assertNum("d", NUMBER, 2)}},
+					asserts: []assert{
+						assertNum("c", 1),
+						assertNum("d", 2)}},
 				line{stmt: "a=3",
-					asserts: []assert{assertNum("a", NUMBER, 3),
-						assertNum("c", NUMBER, 1),
-						assertNum("d", NUMBER, 2)}},
+					asserts: []assert{
+						assertNum("a", 3),
+						assertNum("c", 1),
+						assertNum("d", 2)}},
 				line{stmt: "b=5",
-					asserts: []assert{assertNum("a", NUMBER, 3),
-						assertNum("b", NUMBER, 5),
-						assertNum("c", NUMBER, 1),
-						assertNum("d", NUMBER, 2)}},
+					asserts: []assert{
+						assertNum("a", 3),
+						assertNum("b", 5),
+						assertNum("c", 1),
+						assertNum("d", 2)}},
 				line{stmt: "c=a*b",
-					asserts: []assert{assertNum("a", NUMBER, 3),
-						assertNum("b", NUMBER, 5),
-						assertNum("c", NUMBER, 15),
-						assertNum("d", NUMBER, 16)}},
+					asserts: []assert{
+						assertNum("a", 3),
+						assertNum("b", 5),
+						assertNum("c", 15),
+						assertNum("d", 16)}},
 				line{stmt: "a=b*2",
-					asserts: []assert{assertNum("a", NUMBER, 10),
-						assertNum("b", NUMBER, 5),
-						assertNum("c", NUMBER, 50),
-						assertNum("d", NUMBER, 51)}},
+					asserts: []assert{
+						assertNum("a", 10),
+						assertNum("b", 5),
+						assertNum("c", 50),
+						assertNum("d", 51)}},
 			},
-		}, {
+		}, { // basic contextual evaluation tests
 			lines: []line{
 				line{stmt: "a=(b+1)[b=1]",
 					asserts: []assert{
-						assertNum("a", NUMBER, 2),
+						assertNum("a", 2),
 						assertEmpty("b"),
 					}},
 				line{stmt: "a=b[b=1]+1",
 					asserts: []assert{
-						assertNum("a", NUMBER, 2),
+						assertNum("a", 2),
 						assertEmpty("b"),
 					}},
 				line{stmt: "square=(n*n)[n=11]",
 					asserts: []assert{
-						assertNum("square", NUMBER, 121),
+						assertNum("square", 121),
 						assertEmpty("n"),
 					}},
 				line{stmt: "mult=(n*m)[n=10][m=16]-1",
 					asserts: []assert{
-						assertNum("mult", NUMBER, 159),
+						assertNum("mult", 159),
 						assertEmpty("n"),
 						assertEmpty("m"),
 					}},
 				line{stmt: "n=1[unrelated=11]",
 					asserts: []assert{
-						assertNum("n", NUMBER, 1),
+						assertNum("n", 1),
 						assertEmpty("unrelated"),
 					}},
-			},
-		}, {
-			lines: []line{
-				line{stmt: "n=5", asserts: []assert{}},
-				line{stmt: "nn=n*n", asserts: []assert{}},
-				line{stmt: "m=1+nn[n=4]",
+				line{stmt: "p=5", asserts: []assert{}},
+				line{stmt: "pp=p*p", asserts: []assert{}},
+				line{stmt: "q=1+pp[p=4]",
 					asserts: []assert{
-						assertNum("n", NUMBER, 5),
-						assertNum("nn", NUMBER, 25),
-						assertNum("m", NUMBER, 17),
+						assertNum("p", 5),
+						assertNum("pp", 25),
+						assertNum("q", 17),
 					}},
-				line{stmt: "m=",
+				line{stmt: "q=",
 					asserts: []assert{
-						assertEmpty("m"),
+						assertEmpty("q"),
+					}},
+			},
+		}, { // basic builtin function tests
+			lines: []line{
+				line{stmt: "a=IF(TRUE,5,10)",
+					asserts: []assert{
+						assertNum("a", 5),
+					}},
+				line{stmt: "even11=IF( EQ(n%2,0), TRUE, FALSE)[n=11]",
+					asserts: []assert{
+						assertBool("even11", false),
 					}},
 			},
 		},
@@ -125,12 +142,18 @@ func TestRuntimeLoadsEvaluatesCaches(t *testing.T) {
 					t.Errorf("test case %v, line %v: expected %v to have type %v, got type %v",
 						i, j, id.lit, assert.val.typ, id.val.typ)
 				}
-				if assert.val.typ == NUMBER {
+				switch assert.val.typ {
+				case NUMBER:
 					if id.val.num != assert.val.num {
 						t.Errorf("test case %v, line %v: expected %v to have num %v, got num %v",
 							i, j, id.lit, assert.val.num, id.val.num)
 					}
-				} else {
+				case BOOL:
+					if id.val.b != assert.val.b {
+						t.Errorf("test case %v, line %v: expected %v to have bool %v, got bool %v",
+							i, j, id.lit, assert.val.b, id.val.b)
+					}
+				default:
 					t.Errorf("test case %v, line %v: unhandled type %v", i, j, assert.val.typ)
 				}
 			}

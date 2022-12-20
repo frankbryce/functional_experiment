@@ -18,8 +18,8 @@ const (
 	VAL
 
 	CTX  // inline function support
-    ARGS // external API function arg list
-    CALL // external API function call
+	ARGS // external API function arg list
+	CALL // external API function call
 )
 
 type Expression struct {
@@ -34,4 +34,3 @@ type Expression struct {
 	// used for dependency tracking
 	ids map[string]bool
 }
-

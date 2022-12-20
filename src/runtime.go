@@ -128,6 +128,26 @@ func (r *runtimeImpl) Evaluate(e *Expression) (*Value, error) {
 		}
 		r.execute(restore_stmt)
 		return v, nil
+	case ARGS:
+		return nil, fmt.Errorf("Unexpected evaluation of an ARGS expression: %v.", e.lit)
+	case CALL:
+		args := make([]*Value, len(e.e))
+		for i, arg := range e.e {
+			argv, err := r.Evaluate(arg)
+			if err != nil {
+				return nil, err
+			}
+			args[i] = argv
+		}
+		fid := strings.ToUpper(e.id.lit)
+		switch fid {
+		case "IF":
+			return IF{}.Call(args)
+		case "EQ":
+			return EQ{}.Call(args)
+		default:
+			return PLUGIN{}.Call(args)
+		}
 	case NEG:
 		v, err := r.Evaluate(e.e[0])
 		if err != nil {
@@ -210,4 +230,3 @@ func (r *runtimeImpl) Evaluate(e *Expression) (*Value, error) {
 func (r *runtimeImpl) Update(d Display) error {
 	return nil
 }
-

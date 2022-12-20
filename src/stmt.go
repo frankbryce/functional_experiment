@@ -6,4 +6,3 @@ type Statement struct {
 	ex  *Expression
 	lit string
 }
-

@@ -54,7 +54,7 @@ func subtractId(e *Expression, id *Identifier) map[string]bool {
 // math symbols
 %token <Literal> TSLASH TDASH TPLUS TASTERISK TPERCENT TCARET
 // other symbols
-%token <Literal> TLPAREN TRPAREN TLBRACK TRBRACK TEQUALS TDOT
+%token <Literal> TLPAREN TRPAREN TLBRACK TRBRACK TEQUALS TDOT TCOMMA
 // other lex tokens for lexer
 %token <Literal> ILLEGAL
 
@@ -62,9 +62,10 @@ func subtractId(e *Expression, id *Identifier) map[string]bool {
 %token <Literal> TSTRING TNUMBER
 %token <Literal> TFALSE TTRUE TNULL
 
+%left TCOMMA
 %left TPLUS TDASH
 %left TASTERISK TSLASH
-%left TAMPERSAND
+%left TPERCENT
 %left NEGATE
 %right TCARET
 %right TDOT
@@ -72,6 +73,7 @@ func subtractId(e *Expression, id *Identifier) map[string]bool {
 
 // grammar productions
 %type <Value> value
+%type <Expression> arglist
 %type <Statement> statement
 %type <Expression> expression
 %type <Identifier> identifier
@@ -112,6 +114,25 @@ value       : TNUMBER {
                 $$ = NewNullValue($1)
             }
 ;
+arglist     : /* empty */ {
+                $$ = &Expression{
+                    typ:ARGS, e:[]*Expression{}, ids:make(map[string]bool), lit:"",
+                }
+            }
+            | expression {
+                $$ = &Expression{
+                    typ:ARGS, e:[]*Expression{$1}, ids:$1.ids, lit:$1.lit,
+                }
+            }
+            | arglist TCOMMA expression {
+                $$ = &Expression {
+                    typ:ARGS,
+                    e:append($1.e,$3),
+                    ids:mergeIds($1,$3),
+                    lit:$1.lit+$2+$3.lit,
+                }
+            }
+;
 expression  : identifier {
                 ids := make(map[string]bool)
                 ids[$1.lit] = true
@@ -144,6 +165,12 @@ expression  : identifier {
                     ids:mergeIds($1,$3),
                 }
             }
+            | expression TPERCENT expression {
+                $$ = &Expression{
+                    typ:MOD, e:[]*Expression{$1, $3}, lit:$1.lit+$2+$3.lit,
+                    ids:mergeIds($1,$3),
+                }
+            }
             | TDASH expression %prec NEGATE {
                 $$ = &Expression{
                     typ:NEG, e:[]*Expression{$2}, lit:$1+$2.lit,
@@ -160,6 +187,15 @@ expression  : identifier {
                 $$ = &Expression{
                     typ:PAREN, e:[]*Expression{$2}, lit:$1+$2.lit+$3,
                     ids:$2.ids,
+                }
+            }
+            | identifier TLPAREN arglist TRPAREN {
+                $$ = &Expression{
+                    typ:CALL,
+                    id:$1,
+                    e:$3.e,
+                    lit:$1.lit+$2+$3.lit+$4,
+                    ids:$3.ids,
                 }
             }
             | expression TLBRACK statement TRBRACK {

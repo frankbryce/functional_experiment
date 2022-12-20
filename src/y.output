@@ -26,7 +26,7 @@ state 2
 state 3
 	identifier:  TSTRING.    (3)
 
-	.  reduce 3 (src line 90)
+	.  reduce 3 (src line 92)
 
 
 state 4
@@ -40,7 +40,7 @@ state 4
 	TFALSE  shift 11
 	TTRUE  shift 12
 	TNULL  shift 13
-	.  reduce 1 (src line 81)
+	.  reduce 1 (src line 83)
 
 	value  goto 7
 	expression  goto 5
@@ -52,6 +52,7 @@ state 5
 	expression:  expression.TDASH expression 
 	expression:  expression.TASTERISK expression 
 	expression:  expression.TSLASH expression 
+	expression:  expression.TPERCENT expression 
 	expression:  expression.TCARET expression 
 	expression:  expression.TLBRACK statement TRBRACK 
 
@@ -59,21 +60,24 @@ state 5
 	TDASH  shift 15
 	TPLUS  shift 14
 	TASTERISK  shift 16
-	TCARET  shift 18
-	TLBRACK  shift 19
-	.  reduce 2 (src line 85)
+	TPERCENT  shift 18
+	TCARET  shift 19
+	TLBRACK  shift 20
+	.  reduce 2 (src line 87)
 
 
 state 6
-	expression:  identifier.    (9)
+	expression:  identifier.    (12)
+	expression:  identifier.TLPAREN arglist TRPAREN 
 
-	.  reduce 9 (src line 115)
+	TLPAREN  shift 21
+	.  reduce 12 (src line 136)
 
 
 state 7
-	expression:  value.    (10)
+	expression:  value.    (13)
 
-	.  reduce 10 (src line 120)
+	.  reduce 13 (src line 141)
 
 
 state 8
@@ -89,7 +93,7 @@ state 8
 	.  error
 
 	value  goto 7
-	expression  goto 20
+	expression  goto 22
 	identifier  goto 6
 
 state 9
@@ -105,33 +109,33 @@ state 9
 	.  error
 
 	value  goto 7
-	expression  goto 21
+	expression  goto 23
 	identifier  goto 6
 
 state 10
 	value:  TNUMBER.    (4)
 	value:  TNUMBER.TDOT TNUMBER 
 
-	TDOT  shift 22
-	.  reduce 4 (src line 94)
+	TDOT  shift 24
+	.  reduce 4 (src line 96)
 
 
 state 11
 	value:  TFALSE.    (6)
 
-	.  reduce 6 (src line 105)
+	.  reduce 6 (src line 107)
 
 
 state 12
 	value:  TTRUE.    (7)
 
-	.  reduce 7 (src line 108)
+	.  reduce 7 (src line 110)
 
 
 state 13
 	value:  TNULL.    (8)
 
-	.  reduce 8 (src line 111)
+	.  reduce 8 (src line 113)
 
 
 state 14
@@ -147,7 +151,7 @@ state 14
 	.  error
 
 	value  goto 7
-	expression  goto 23
+	expression  goto 25
 	identifier  goto 6
 
 state 15
@@ -163,7 +167,7 @@ state 15
 	.  error
 
 	value  goto 7
-	expression  goto 24
+	expression  goto 26
 	identifier  goto 6
 
 state 16
@@ -179,7 +183,7 @@ state 16
 	.  error
 
 	value  goto 7
-	expression  goto 25
+	expression  goto 27
 	identifier  goto 6
 
 state 17
@@ -195,10 +199,26 @@ state 17
 	.  error
 
 	value  goto 7
-	expression  goto 26
+	expression  goto 28
 	identifier  goto 6
 
 state 18
+	expression:  expression TPERCENT.expression 
+
+	TDASH  shift 8
+	TLPAREN  shift 9
+	TSTRING  shift 3
+	TNUMBER  shift 10
+	TFALSE  shift 11
+	TTRUE  shift 12
+	TNULL  shift 13
+	.  error
+
+	value  goto 7
+	expression  goto 29
+	identifier  goto 6
+
+state 19
 	expression:  expression TCARET.expression 
 
 	TDASH  shift 8
@@ -211,37 +231,57 @@ state 18
 	.  error
 
 	value  goto 7
-	expression  goto 27
+	expression  goto 30
 	identifier  goto 6
 
-state 19
+state 20
 	expression:  expression TLBRACK.statement TRBRACK 
 
 	TSTRING  shift 3
 	.  error
 
-	statement  goto 28
+	statement  goto 31
 	identifier  goto 2
 
-state 20
+state 21
+	expression:  identifier TLPAREN.arglist TRPAREN 
+	arglist: .    (9)
+
+	TDASH  shift 8
+	TLPAREN  shift 9
+	TSTRING  shift 3
+	TNUMBER  shift 10
+	TFALSE  shift 11
+	TTRUE  shift 12
+	TNULL  shift 13
+	.  reduce 9 (src line 117)
+
+	value  goto 7
+	arglist  goto 32
+	expression  goto 33
+	identifier  goto 6
+
+state 22
 	expression:  expression.TPLUS expression 
 	expression:  expression.TDASH expression 
 	expression:  expression.TASTERISK expression 
 	expression:  expression.TSLASH expression 
-	expression:  TDASH expression.    (15)
+	expression:  expression.TPERCENT expression 
+	expression:  TDASH expression.    (19)
 	expression:  expression.TCARET expression 
 	expression:  expression.TLBRACK statement TRBRACK 
 
-	TCARET  shift 18
-	TLBRACK  shift 19
-	.  reduce 15 (src line 147)
+	TCARET  shift 19
+	TLBRACK  shift 20
+	.  reduce 19 (src line 174)
 
 
-state 21
+state 23
 	expression:  expression.TPLUS expression 
 	expression:  expression.TDASH expression 
 	expression:  expression.TASTERISK expression 
 	expression:  expression.TSLASH expression 
+	expression:  expression.TPERCENT expression 
 	expression:  expression.TCARET expression 
 	expression:  TLPAREN expression.TRPAREN 
 	expression:  expression.TLBRACK statement TRBRACK 
@@ -250,127 +290,223 @@ state 21
 	TDASH  shift 15
 	TPLUS  shift 14
 	TASTERISK  shift 16
-	TCARET  shift 18
-	TRPAREN  shift 29
-	TLBRACK  shift 19
+	TPERCENT  shift 18
+	TCARET  shift 19
+	TRPAREN  shift 34
+	TLBRACK  shift 20
 	.  error
-
-
-state 22
-	value:  TNUMBER TDOT.TNUMBER 
-
-	TNUMBER  shift 30
-	.  error
-
-
-state 23
-	expression:  expression.TPLUS expression 
-	expression:  expression TPLUS expression.    (11)
-	expression:  expression.TDASH expression 
-	expression:  expression.TASTERISK expression 
-	expression:  expression.TSLASH expression 
-	expression:  expression.TCARET expression 
-	expression:  expression.TLBRACK statement TRBRACK 
-
-	TSLASH  shift 17
-	TASTERISK  shift 16
-	TCARET  shift 18
-	TLBRACK  shift 19
-	.  reduce 11 (src line 123)
 
 
 state 24
-	expression:  expression.TPLUS expression 
-	expression:  expression.TDASH expression 
-	expression:  expression TDASH expression.    (12)
-	expression:  expression.TASTERISK expression 
-	expression:  expression.TSLASH expression 
-	expression:  expression.TCARET expression 
-	expression:  expression.TLBRACK statement TRBRACK 
+	value:  TNUMBER TDOT.TNUMBER 
 
-	TSLASH  shift 17
-	TASTERISK  shift 16
-	TCARET  shift 18
-	TLBRACK  shift 19
-	.  reduce 12 (src line 129)
+	TNUMBER  shift 35
+	.  error
 
 
 state 25
 	expression:  expression.TPLUS expression 
+	expression:  expression TPLUS expression.    (14)
 	expression:  expression.TDASH expression 
 	expression:  expression.TASTERISK expression 
-	expression:  expression TASTERISK expression.    (13)
 	expression:  expression.TSLASH expression 
+	expression:  expression.TPERCENT expression 
 	expression:  expression.TCARET expression 
 	expression:  expression.TLBRACK statement TRBRACK 
 
-	TCARET  shift 18
-	TLBRACK  shift 19
-	.  reduce 13 (src line 135)
+	TSLASH  shift 17
+	TASTERISK  shift 16
+	TPERCENT  shift 18
+	TCARET  shift 19
+	TLBRACK  shift 20
+	.  reduce 14 (src line 144)
 
 
 state 26
 	expression:  expression.TPLUS expression 
 	expression:  expression.TDASH expression 
+	expression:  expression TDASH expression.    (15)
 	expression:  expression.TASTERISK expression 
 	expression:  expression.TSLASH expression 
-	expression:  expression TSLASH expression.    (14)
+	expression:  expression.TPERCENT expression 
 	expression:  expression.TCARET expression 
 	expression:  expression.TLBRACK statement TRBRACK 
 
-	TCARET  shift 18
-	TLBRACK  shift 19
-	.  reduce 14 (src line 141)
+	TSLASH  shift 17
+	TASTERISK  shift 16
+	TPERCENT  shift 18
+	TCARET  shift 19
+	TLBRACK  shift 20
+	.  reduce 15 (src line 150)
 
 
 state 27
 	expression:  expression.TPLUS expression 
 	expression:  expression.TDASH expression 
 	expression:  expression.TASTERISK expression 
+	expression:  expression TASTERISK expression.    (16)
 	expression:  expression.TSLASH expression 
+	expression:  expression.TPERCENT expression 
 	expression:  expression.TCARET expression 
-	expression:  expression TCARET expression.    (16)
 	expression:  expression.TLBRACK statement TRBRACK 
 
-	TCARET  shift 18
-	TLBRACK  shift 19
-	.  reduce 16 (src line 153)
+	TPERCENT  shift 18
+	TCARET  shift 19
+	TLBRACK  shift 20
+	.  reduce 16 (src line 156)
 
 
 state 28
-	expression:  expression TLBRACK statement.TRBRACK 
+	expression:  expression.TPLUS expression 
+	expression:  expression.TDASH expression 
+	expression:  expression.TASTERISK expression 
+	expression:  expression.TSLASH expression 
+	expression:  expression TSLASH expression.    (17)
+	expression:  expression.TPERCENT expression 
+	expression:  expression.TCARET expression 
+	expression:  expression.TLBRACK statement TRBRACK 
 
-	TRBRACK  shift 31
-	.  error
+	TPERCENT  shift 18
+	TCARET  shift 19
+	TLBRACK  shift 20
+	.  reduce 17 (src line 162)
 
 
 state 29
-	expression:  TLPAREN expression TRPAREN.    (17)
+	expression:  expression.TPLUS expression 
+	expression:  expression.TDASH expression 
+	expression:  expression.TASTERISK expression 
+	expression:  expression.TSLASH expression 
+	expression:  expression.TPERCENT expression 
+	expression:  expression TPERCENT expression.    (18)
+	expression:  expression.TCARET expression 
+	expression:  expression.TLBRACK statement TRBRACK 
 
-	.  reduce 17 (src line 159)
+	TCARET  shift 19
+	TLBRACK  shift 20
+	.  reduce 18 (src line 168)
 
 
 state 30
-	value:  TNUMBER TDOT TNUMBER.    (5)
+	expression:  expression.TPLUS expression 
+	expression:  expression.TDASH expression 
+	expression:  expression.TASTERISK expression 
+	expression:  expression.TSLASH expression 
+	expression:  expression.TPERCENT expression 
+	expression:  expression.TCARET expression 
+	expression:  expression TCARET expression.    (20)
+	expression:  expression.TLBRACK statement TRBRACK 
 
-	.  reduce 5 (src line 99)
+	TCARET  shift 19
+	TLBRACK  shift 20
+	.  reduce 20 (src line 180)
 
 
 state 31
-	expression:  expression TLBRACK statement TRBRACK.    (18)
+	expression:  expression TLBRACK statement.TRBRACK 
 
-	.  reduce 18 (src line 165)
+	TRBRACK  shift 36
+	.  error
 
 
-23 terminals, 5 nonterminals
-19 grammar rules, 32/16000 states
+state 32
+	arglist:  arglist.TCOMMA expression 
+	expression:  identifier TLPAREN arglist.TRPAREN 
+
+	TRPAREN  shift 38
+	TCOMMA  shift 37
+	.  error
+
+
+state 33
+	arglist:  expression.    (10)
+	expression:  expression.TPLUS expression 
+	expression:  expression.TDASH expression 
+	expression:  expression.TASTERISK expression 
+	expression:  expression.TSLASH expression 
+	expression:  expression.TPERCENT expression 
+	expression:  expression.TCARET expression 
+	expression:  expression.TLBRACK statement TRBRACK 
+
+	TSLASH  shift 17
+	TDASH  shift 15
+	TPLUS  shift 14
+	TASTERISK  shift 16
+	TPERCENT  shift 18
+	TCARET  shift 19
+	TLBRACK  shift 20
+	.  reduce 10 (src line 122)
+
+
+state 34
+	expression:  TLPAREN expression TRPAREN.    (21)
+
+	.  reduce 21 (src line 186)
+
+
+state 35
+	value:  TNUMBER TDOT TNUMBER.    (5)
+
+	.  reduce 5 (src line 101)
+
+
+state 36
+	expression:  expression TLBRACK statement TRBRACK.    (23)
+
+	.  reduce 23 (src line 201)
+
+
+state 37
+	arglist:  arglist TCOMMA.expression 
+
+	TDASH  shift 8
+	TLPAREN  shift 9
+	TSTRING  shift 3
+	TNUMBER  shift 10
+	TFALSE  shift 11
+	TTRUE  shift 12
+	TNULL  shift 13
+	.  error
+
+	value  goto 7
+	expression  goto 39
+	identifier  goto 6
+
+state 38
+	expression:  identifier TLPAREN arglist TRPAREN.    (22)
+
+	.  reduce 22 (src line 192)
+
+
+state 39
+	arglist:  arglist TCOMMA expression.    (11)
+	expression:  expression.TPLUS expression 
+	expression:  expression.TDASH expression 
+	expression:  expression.TASTERISK expression 
+	expression:  expression.TSLASH expression 
+	expression:  expression.TPERCENT expression 
+	expression:  expression.TCARET expression 
+	expression:  expression.TLBRACK statement TRBRACK 
+
+	TSLASH  shift 17
+	TDASH  shift 15
+	TPLUS  shift 14
+	TASTERISK  shift 16
+	TPERCENT  shift 18
+	TCARET  shift 19
+	TLBRACK  shift 20
+	.  reduce 11 (src line 127)
+
+
+23 terminals, 6 nonterminals
+24 grammar rules, 40/16000 states
 0 shift/reduce, 0 reduce/reduce conflicts reported
-54 working sets used
-memory: parser 35/240000
-31 extra closures
-91 shift entries, 1 exceptions
-14 goto entries
-14 entries saved by goto default
-Optimizer space used: output 52/240000
-52 table entries, 7 zero
-maximum spread: 21, maximum offset: 19
+55 working sets used
+memory: parser 43/240000
+36 extra closures
+137 shift entries, 1 exceptions
+18 goto entries
+20 entries saved by goto default
+Optimizer space used: output 63/240000
+63 table entries, 5 zero
+maximum spread: 22, maximum offset: 37
